@@ -11,8 +11,8 @@ ENV MYSQL_PASSWORD=wordpress_password
 FROM wordpress:latest
 
 # Copy the MySQL configuration from the mysql_stage
-COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
-COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
+# COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
+# COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
 
 # Expose port 80 for HTTP
 EXPOSE 80
