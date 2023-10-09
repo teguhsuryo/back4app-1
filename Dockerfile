@@ -17,4 +17,4 @@ EXPOSE 3306
 # Optionally, you can copy SQL scripts to initialize the database
 # COPY ./init.sql /docker-entrypoint-initdb.d/
 
-CMD ["mysqld"]
+# CMD ["mysqld"]
