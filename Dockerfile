@@ -1,4 +1,4 @@
-# Use an official MySQL image as the initial build stage
+# Stage 1: Build MySQL image
 FROM mysql:5.7 as mysql_stage
 
 # Set MySQL environment variables (replace with your values)
@@ -7,21 +7,21 @@ ENV MYSQL_DATABASE=wordpress
 ENV MYSQL_USER=wordpress_user
 ENV MYSQL_PASSWORD=wordpress_password
 
-# Use an official WordPress image as the final build stage
+# Stage 2: Build WordPress image
 FROM wordpress:latest
-
-# Copy the MySQL configuration from the mysql_stage
-# COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
-# COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
 
 # Expose port 80 for HTTP
 EXPOSE 80
 
-# Define environment variables for WordPress
-ENV WORDPRESS_DB_HOST=127.0.0.1
+# Set environment variables for WordPress
+ENV WORDPRESS_DB_HOST=mysql_stage
 ENV WORDPRESS_DB_USER=$MYSQL_USER
 ENV WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
 ENV WORDPRESS_DB_NAME=$MYSQL_DATABASE
 
+# Copy MySQL configuration from the mysql_stage
+COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
+COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
+
 # Define the entry point
-# CMD ["apache2-foreground"]
+CMD ["apache2-foreground"]
