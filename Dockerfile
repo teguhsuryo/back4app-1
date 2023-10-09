@@ -20,8 +20,8 @@ ENV WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
 ENV WORDPRESS_DB_NAME=$MYSQL_DATABASE
 
 # Copy MySQL configuration from the mysql_stage
-COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
-COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
+# COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
+# COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
 
 # Define the entry point
-CMD ["apache2-foreground"]
+# CMD ["apache2-foreground"]
