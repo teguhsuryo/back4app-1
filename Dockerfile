@@ -1,20 +1,27 @@
-# Use an official MySQL base image from Docker Hub
-FROM mysql:5.7
+# Use an official MySQL image as the initial build stage
+FROM mysql:5.7 as mysql_stage
 
-# Optional: Set the MySQL root password (replace 'your_root_password')
-ENV MYSQL_ROOT_PASSWORD=your_root_password
+# Set MySQL environment variables (replace with your values)
+ENV MYSQL_ROOT_PASSWORD=root_password
+ENV MYSQL_DATABASE=wordpress
+ENV MYSQL_USER=wordpress_user
+ENV MYSQL_PASSWORD=wordpress_password
 
-# Optional: Create a database during image build (replace 'your_db_name')
-# ENV MYSQL_DATABASE=your_db_name
+# Use an official WordPress image as the final build stage
+FROM wordpress:latest
 
-# Optional: Create a user and grant privileges (replace 'your_db_user' and 'your_db_password')
-# ENV MYSQL_USER=your_db_user
-# ENV MYSQL_PASSWORD=your_db_password
+# Copy the MySQL configuration from the mysql_stage
+COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
+COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
 
-# Expose port 3306 for MySQL connections
-EXPOSE 3306
+# Expose port 80 for HTTP
+EXPOSE 80
 
-# Optionally, you can copy SQL scripts to initialize the database
-# COPY ./init.sql /docker-entrypoint-initdb.d/
+# Define environment variables for WordPress
+ENV WORDPRESS_DB_HOST=127.0.0.1
+ENV WORDPRESS_DB_USER=$MYSQL_USER
+ENV WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+ENV WORDPRESS_DB_NAME=$MYSQL_DATABASE
 
-# CMD ["mysqld"]
+# Define the entry point
+# CMD ["apache2-foreground"]
