@@ -25,8 +25,8 @@ RUN echo -e '#!/bin/bash\n\
 /usr/sbin/sshd\n\
 wssh' > /start.sh && chmod +x /start.sh
 
-# Expose port 8080 for the web-based SSH client
-EXPOSE 8888
-
 # Start the SSH server and the web-based SSH client
 CMD ["/start.sh"]
+
+# Expose port 8888 for the web-based SSH client
+EXPOSE 8888
