@@ -10,14 +10,30 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create directory for Adminer
-RUN mkdir -p /var/www/html/adminer
+# Set up MariaDB root password (change 'your_password' to your desired password)
+ENV MYSQL_ROOT_PASSWORD=your_password
+
+# Create a custom database, user, and password
+ENV MYSQL_DATABASE=mydatabase
+ENV MYSQL_USER=myuser
+ENV MYSQL_PASSWORD=mypassword
+
+# Initialize MariaDB and create the custom database
+RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
+RUN mysqld --user=mysql --initialize-insecure --skip-networking && \
+    mysqld --user=mysql --skip-networking & \
+    sleep 5 && \
+    mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';" && \
+    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" && \
+    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" && \
+    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
 
 # Install Adminer
-RUN wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
+RUN mkdir /var/www/html/adminer && \
+    wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
 
 # Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
 
-# Start MariaDB using mysqld
-CMD mysqld && php -S 0.0.0.0:8080 -t /var/www/html/adminer
+# Start MariaDB service
+CMD mysqld --user=mysql && php -S 0.0.0.0:8080 -t /var/www/html/
