@@ -14,8 +14,11 @@ RUN echo 'root:password' | chpasswd
 # Permit root login via SSH (for demonstration purposes; use SSH keys in production)
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Configure Shell In A Box
-RUN echo 'shellinaboxd -t -s "/:root:root:/bin/bash"' >> /etc/default/shellinabox
+# Generate a self-signed SSL certificate for Shell In A Box (replace with your own certificate in production)
+RUN openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost" -keyout /etc/shellinabox/certificate.pem -out /etc/shellinabox/certificate.pem
+
+# Configure Shell In A Box to use the generated SSL certificate
+RUN sed -i 's/--certfile \/etc\/shellinabox\/certificate.pem/--disable-ssl/g' /etc/default/shellinabox
 
 # Expose SSH and Shell In A Box ports
 EXPOSE 4200
