@@ -10,9 +10,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set up MariaDB root password (change 'your_password' to your desired password)
-ENV MYSQL_ROOT_PASSWORD=your_password
-
 # Create a custom database, user, and password
 ENV MYSQL_DATABASE=mydatabase
 ENV MYSQL_USER=myuser
@@ -20,13 +17,14 @@ ENV MYSQL_PASSWORD=mypassword
 
 # Initialize MariaDB and create the custom database
 RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
-RUN mysqld --user=mysql --initialize-insecure --skip-networking && \
-    mysqld --user=mysql --skip-networking & \
+RUN mysqld --user=mysql --skip-networking --skip-grant-tables & \
     sleep 5 && \
-    mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';" && \
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" && \
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" && \
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
+    echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'your_password';" > /tmp/init.sql && \
+    echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" >> /tmp/init.sql && \
+    echo "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" >> /tmp/init.sql && \
+    echo "FLUSH PRIVILEGES;" >> /tmp/init.sql && \
+    mysql -u root < /tmp/init.sql && \
+    rm /tmp/init.sql
 
 # Install Adminer
 RUN mkdir /var/www/html/adminer && \
