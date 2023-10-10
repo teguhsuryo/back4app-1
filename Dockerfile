@@ -19,5 +19,5 @@ RUN wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
 # Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
 
-# Start MariaDB using mysqld
-CMD mysqld && php -S 0.0.0.0:8080 -t /var/www/html/
+# Start MariaDB using mysqld_safe and specify a non-root user
+CMD mysqld_safe --user=mysql && php -S 0.0.0.0:8080 -t /var/www/html/
