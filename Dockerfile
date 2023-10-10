@@ -14,11 +14,10 @@ RUN apt-get update && \
 RUN mkdir -p /var/www/html/adminer
 
 # Install Adminer
-RUN wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.ph
-
-# Start MariaDB using mysqld
-CMD mysqld && php -S 0.0.0.0:8080 -t /var/www/html/
+RUN wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
 
 # Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
- 
+
+# Start MariaDB using mysqld
+CMD mysqld && php -S 0.0.0.0:8080 -t /var/www/html/
