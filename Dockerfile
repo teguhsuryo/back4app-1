@@ -10,9 +10,11 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Create directory for Adminer
+RUN mkdir -p /var/www/html/adminer
+
 # Install Adminer
-RUN mkdir /var/www/html/adminer && \
-    wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
+RUN wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
 
 # Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
