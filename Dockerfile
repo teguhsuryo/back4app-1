@@ -1,21 +1,24 @@
-# Use the official Ubuntu image as the base image
 FROM ubuntu:latest
 
-# Set environment variables to suppress interactive installation prompts
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install MySQL and Adminer dependencies
+# Install MySQL server and client
 RUN apt-get update && \
-    apt-get install -y mysql-server php-cli php-mysql wget && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server mysql-client
 
-# Install Adminer
-RUN mkdir /var/www/html/adminer && \
-    wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
+# Set root password for MySQL
+RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections && \
+    echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
 
-# Start MySQL service
-CMD /etc/init.d/mysql start && php -S 0.0.0.0:8080 -t /var/www/html/
+# Install PHP and required extensions
+RUN apt-get install -y php php-mysql php-gd php-zip php-mbstring
 
-# Expose port 8080 for Adminer (you can change the port if needed)
+# Download and extract Adminer
+RUN mkdir /var/www && \
+    cd /var/www && \
+    curl -LJO https://github.com/vrana/adminer/releases/latest/download/adminer-latest.php && \
+    mv adminer-latest.php adminer.php
+
+# Start MySQL server and run Adminer
+CMD service mysql start && php -S 0.0.0.0:8080 -t /var/www
+
+# Expose port 8080 for Adminer
 EXPOSE 8080
