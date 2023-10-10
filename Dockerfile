@@ -16,8 +16,8 @@ RUN mkdir -p /var/www/html/adminer
 # Install Adminer
 RUN wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
 
-# Start MariaDB service using systemctl
-CMD systemctl start mysql && php -S 0.0.0.0:8080 -t /var/www/html/
+# Start MariaDB service using the service command
+CMD service mysql start && php -S 0.0.0.0:8080 -t /var/www/html/
 
 # Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
