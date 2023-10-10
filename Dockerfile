@@ -7,6 +7,12 @@ ENV MYSQL_DATABASE=wordpress
 ENV MYSQL_USER=wpuser
 ENV MYSQL_PASSWORD=wppassword
 
+# Add a sleep command to wait for MySQL to initialize
+RUN sleep 10
+
+# Start services
+CMD service mysql start
+
 # Stage 2: Build WordPress
 FROM wordpress:latest
 
@@ -21,12 +27,6 @@ ENV WORDPRESS_DB_HOST=localhost
 ENV WORDPRESS_DB_USER=wpuser
 ENV WORDPRESS_DB_PASSWORD=wppassword
 ENV WORDPRESS_DB_NAME=wordpress
-
-# Add a sleep command to wait for MySQL to initialize
-RUN sleep 10
-
-# Start services
-CMD service mysql start && /usr/sbin/apache2ctl -D FOREGROUND
 
 # Expose the default WordPress port
 EXPOSE 80
