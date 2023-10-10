@@ -20,13 +20,7 @@ ENV MYSQL_PASSWORD=mypassword
 
 # Initialize MariaDB and create the custom database
 RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
-RUN mysqld --user=mysql --initialize-insecure --skip-networking && \
-    mysqld --user=mysql --skip-networking & \
-    sleep 5 && \
-    mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';" && \
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" && \
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" && \
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "FLUSH PRIVILEGES;"
+RUN service mysql start && mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';" && mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" && mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';" && mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "FLUSH PRIVILEGES;" && service mysql stop
 
 # Install Adminer
 RUN mkdir /var/www/html/adminer && \
@@ -36,4 +30,4 @@ RUN mkdir /var/www/html/adminer && \
 EXPOSE 8080
 
 # Start MariaDB service
-CMD mysqld --user=mysql && php -S 0.0.0.0:8080 -t /var/www/html/
+CMD service mysql start && php -S 0.0.0.0:8080 -t /var/www/html/
