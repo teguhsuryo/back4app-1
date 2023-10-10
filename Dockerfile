@@ -20,8 +20,11 @@ RUN apt-get install -y python3 python3-pip
 # Install webssh
 RUN pip3 install webssh
 
-# Start the SSH server and the web-based SSH client
-CMD ["/bin/bash", "-c", "/usr/sbin/sshd && wssh"]
+# Copy the webssh files to the container
+RUN cp -r /usr/local/lib/python3.8/dist-packages/webssh/static /webssh
 
-# Expose port 8888 for the web-based SSH client
-EXPOSE 8888
+# Use the CMD instruction to start both SSH server and web-based SSH client
+CMD ["/bin/bash", "-c", "/usr/sbin/sshd && python3 -m http.server -d /webssh 8080"]
+
+# Expose port 8080 for the web-based SSH client
+EXPOSE 8080
