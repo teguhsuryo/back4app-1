@@ -1,23 +1,21 @@
+# Use the official Ubuntu image as the base image
 FROM ubuntu:latest
 
-# Install MariaDB
+# Set environment variables to suppress interactive installation prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install MariaDB and Adminer dependencies
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server mariadb-client
+    apt-get install -y mariadb-server php-cli php-mysql wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set root password for MariaDB
-RUN echo "UPDATE mysql.user SET authentication_string=PASSWORD('root') WHERE User='root'; FLUSH PRIVILEGES;" | mysql -u root
+# Install Adminer
+RUN mkdir /var/www/html/adminer && \
+    wget -qO /var/www/html/adminer/index.php https://www.adminer.org/latest.php
 
-# Install PHP and required extensions
-RUN apt-get install -y php php-mysql php-gd php-zip php-mbstring
-
-# Download and extract Adminer
-RUN mkdir /var/www && \
-    cd /var/www && \
-    curl -LJO https://github.com/vrana/adminer/releases/latest/download/adminer-latest.php && \
-    mv adminer-latest.php adminer.php
-
-# Expose port 8080 for Adminer
+# Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
 
-# Start MariaDB server and run Adminer
-CMD service mysql start && php -S 0.0.0.0:8080 -t /var/www
+# Start MariaDB service
+CMD /etc/init.d/mysql start && php -S 0.0.0.0:8080 -t /var/www/html/
