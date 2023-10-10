@@ -15,10 +15,10 @@ RUN echo 'root:password' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Install Python and pip
-RUN apt-get install -y python3
+RUN apt-get install -y python3 python3-pip
 
 # Install webssh
-RUN pip install webssh
+RUN pip3 install webssh
 
 # Use the CMD instruction to start both SSH server and web-based SSH client
 CMD ["/bin/bash", "-c", "/usr/sbin/sshd && wssh --port=80"]
