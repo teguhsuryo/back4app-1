@@ -3,7 +3,7 @@ FROM ubuntu:latest
 
 # Install required packages for OpenSSH server and Shell In A Box
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server shellinabox
+    DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server shellinabox mariadb-server php-cli
 
 # Create a directory for SSH server keys (optional)
 RUN mkdir /var/run/sshd
