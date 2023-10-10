@@ -21,3 +21,4 @@ CMD mysqld && php -S 0.0.0.0:8080 -t /var/www/html/
 
 # Expose port 8080 for Adminer (you can change the port if needed)
 EXPOSE 8080
+ 
