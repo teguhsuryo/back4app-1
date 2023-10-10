@@ -15,19 +15,13 @@ RUN echo 'root:password' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Install Python and pip
-RUN apt-get install -y python3 python3-pip
+RUN apt-get install -y python3
 
 # Install webssh
-RUN pip3 install webssh
-
-# Create a directory to store the webssh files
-RUN mkdir /webssh
-
-# Copy the webssh files to the container
-RUN cp -r /usr/local/lib/python3.8/dist-packages/webssh/static /webssh
+RUN pip install webssh
 
 # Use the CMD instruction to start both SSH server and web-based SSH client
-CMD ["/bin/bash", "-c", "/usr/sbin/sshd && python3 -m http.server -d /webssh 8080"]
+CMD ["/bin/bash", "-c", "/usr/sbin/sshd && wssh --port=80"]
 
-# Expose port 8080 for the web-based SSH client
-EXPOSE 8080
+# Expose port 80 for the web-based SSH client
+EXPOSE 80
