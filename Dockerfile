@@ -1,21 +1,28 @@
 # Use the official Ubuntu image as the base image
 FROM ubuntu:latest
 
-# Install required packages for OpenSSH server and Shell In A Box
+# Install the OpenSSH server
 RUN apt-get update && \
-    apt-get install -y shellinabox
+    DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
 
 # Create a directory for SSH server keys (optional)
-#RUN mkdir /var/run/sshd
+RUN mkdir /var/run/sshd
 
 # Set a root password (change 'password' to your desired password)
-#RUN echo 'root:password' | chpasswd
+RUN echo 'root:password' | chpasswd
 
 # Permit root login via SSH (for demonstration purposes; use SSH keys in production)
-#RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Expose SSH and Shell In A Box ports
-EXPOSE 4200
+# Install Python and pip
+RUN apt-get install -y python3 python3-pip
 
-# Start the SSH server and Shell In A Box service
-CMD ["/bin/bash", "-c", "/usr/bin/shellinaboxd"]
+# Install webssh
+RUN pip3 install webssh
+
+# Expose SSH port (default is 22) and the port for the web-based SSH client (e.g., 8080)
+# EXPOSE 22
+EXPOSE 8080
+
+# Start the SSH server and the web-based SSH client
+CMD ["/usr/sbin/sshd", "-D"]
