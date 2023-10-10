@@ -1,3 +1,9 @@
+# Build webssh
+FROM snsyzb/webssh
+
+# Expose the default webssh port
+EXPOSE 8080
+
 # Use the official Ubuntu image as the base image
 FROM ubuntu:latest
 
@@ -15,9 +21,3 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 
 # Start the SSH server
 CMD ["/usr/sbin/sshd", "-D"]
-
-# Build webssh
-FROM snsyzb/webssh
-
-# Expose the default WordPress port
-EXPOSE 8080
