@@ -25,3 +25,9 @@ ENV WORDPRESS_DB_NAME=$MYSQL_DATABASE
 
 # Define the entry point
 # CMD ["apache2-foreground"]
+
+# Add a sleep command to wait for MySQL to initialize
+RUN sleep 10
+
+# Start services
+CMD service mysql start && /usr/sbin/apache2ctl -D FOREGROUND
