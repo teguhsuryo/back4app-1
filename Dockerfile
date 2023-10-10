@@ -1,30 +1,28 @@
 # Use the official Ubuntu image as the base image
 FROM ubuntu:latest
 
-# Install the OpenSSH server
+# Set environment variables to suppress interactive installation prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required packages (MySQL, Apache, PHP, Adminer)
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
+    apt-get install -y mysql-server apache2 php libapache2-mod-php php-mysql && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create a directory for SSH server keys (optional)
-RUN mkdir /var/run/sshd
+# Install Adminer
+RUN mkdir /var/www/html/adminer && \
+    curl -L https://www.adminer.org/latest.php -o /var/www/html/adminer/index.php
 
-# Set a root password (change 'password' to your desired password)
-RUN echo 'root:password' | chpasswd
+# Configure Apache to serve Adminer
+RUN echo "Alias /adminer /var/www/html/adminer" >> /etc/apache2/apache2.conf && \
+    echo "<Directory /var/www/html/adminer>" >> /etc/apache2/apache2.conf && \
+    echo "  AllowOverride All" >> /etc/apache2/apache2.conf && \
+    echo "</Directory>" >> /etc/apache2/apache2.conf
 
-# Permit root login via SSH (for demonstration purposes; use SSH keys in production)
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# Expose ports for Apache (HTTP) and MySQL
+EXPOSE 80
 
-# Use the CMD instruction to start both SSH server
-CMD ["/bin/bash", "-c", "/usr/sbin/sshd"]
+# Start Apache and MySQL services
+CMD ["/bin/bash", "-c", "/etc/init.d/mysql start && /usr/sbin/apache2ctl -D FOREGROUND"]
 
-# Install Python and pip
-RUN apt-get install -y python3 python3-pip
-
-# Install Gate One
-RUN pip3 install gateone
-
-# Start Gate One with long polling
-CMD ["gateone", "--port", "4433", "--disable_ssl", "--disable_ssl_certificate_verification", "--auth", "none"]
-
-# Expose port 80 for the web-based SSH client
-EXPOSE 4433
