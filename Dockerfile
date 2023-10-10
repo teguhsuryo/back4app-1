@@ -1,33 +1,32 @@
-# Use an official MySQL image as the initial build stage
-FROM mysql:5.7 as mysql_stage
+# Stage 1: Build MySQL
+FROM mysql:latest as mysql_builder
 
-# Set MySQL environment variables (replace with your values)
-ENV MYSQL_ROOT_PASSWORD=root_password
+# Set environment variables for MySQL
+ENV MYSQL_ROOT_PASSWORD=rootpassword
 ENV MYSQL_DATABASE=wordpress
-ENV MYSQL_USER=wordpress_user
-ENV MYSQL_PASSWORD=wordpress_password
+ENV MYSQL_USER=wpuser
+ENV MYSQL_PASSWORD=wppassword
 
-# Use an official WordPress image as the final build stage
+# Stage 2: Build WordPress
 FROM wordpress:latest
 
-# Copy the MySQL configuration from the mysql_stage
-COPY --from=mysql_stage /etc/mysql/my.cnf /etc/mysql/my.cnf
-COPY --from=mysql_stage /var/lib/mysql /var/lib/mysql
+# Install the MySQL client to interact with the MySQL server
+RUN apt-get update && apt-get install -y mysql-client && rm -rf /var/lib/apt/lists/*
 
-# Expose port 80 for HTTP
-EXPOSE 80
+# Copy MySQL configurations from the first stage
+COPY --from=mysql_builder /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
 
-# Define environment variables for WordPress
-ENV WORDPRESS_DB_HOST=127.0.0.1
-ENV WORDPRESS_DB_USER=$MYSQL_USER
-ENV WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
-ENV WORDPRESS_DB_NAME=$MYSQL_DATABASE
-
-# Define the entry point
-# CMD ["apache2-foreground"]
+# Set environment variables for WordPress to connect to the MySQL container
+ENV WORDPRESS_DB_HOST=localhost
+ENV WORDPRESS_DB_USER=wpuser
+ENV WORDPRESS_DB_PASSWORD=wppassword
+ENV WORDPRESS_DB_NAME=wordpress
 
 # Add a sleep command to wait for MySQL to initialize
 RUN sleep 10
 
 # Start services
 CMD service mysql start && /usr/sbin/apache2ctl -D FOREGROUND
+
+# Expose the default WordPress port
+EXPOSE 80
