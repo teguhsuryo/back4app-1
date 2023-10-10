@@ -20,13 +20,8 @@ RUN apt-get install -y python3 python3-pip
 # Install webssh
 RUN pip3 install webssh
 
-# Create a script to start the SSH server and the web-based SSH client
-RUN echo -e '#!/bin/bash\n\
-/usr/sbin/sshd\n\
-wssh' > /start.sh && chmod +x /start.sh
-
 # Start the SSH server and the web-based SSH client
-CMD ["/start.sh"]
+CMD ["/bin/bash", "-c", "/usr/sbin/sshd && wssh"]
 
 # Expose port 8888 for the web-based SSH client
 EXPOSE 8888
