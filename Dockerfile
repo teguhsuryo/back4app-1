@@ -11,7 +11,7 @@ ENV MYSQL_PASSWORD=wppassword
 FROM wordpress:latest
 
 # Install the MySQL client to interact with the MySQL server
-RUN apt-get update && apt-get install -y mysql-client && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y mysql-client && rm -rf /var/lib/apt/lists/*
 
 # Copy MySQL configurations from the first stage
 COPY --from=mysql_builder /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
